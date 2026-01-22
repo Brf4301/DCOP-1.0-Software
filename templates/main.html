@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>DCOP 1.0</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/bootstrap.css') }}"
+    />
+    <style>
+      .item-row {
+        display: inline-block;
+        margin-left: 8px;
+        align-items: center;
+        padding: 10px;
+      }
+
+      .container-fluid {
+        background-color: rgba(61, 213, 243, 0.35);
+      }
+
+      .upload-box {
+        padding: 20px;
+        border: 2px dashed #ccc;
+        margin: 20px auto;
+        max-width: 500px;
+        text-align: center;
+      }
+      #status {
+        margin-top: 10px;
+        color: #666;
+      }
+
+      body {
+        background-color: aliceblue;
+      }
+      .hightlight {
+        background-color: rgba(13, 109, 253, 0.5);
+      }
+    </style>
+    {% block css %} {% endblock %}
+  </head>
+  <body>
+    <div class="container-fluid" style="height: 60px; align-items: center">
+      <div class="item-row1" style="display: inline-block">
+        <span
+          style="
+            display: block;
+            text-align: left;
+            font-size: 16px;
+            font-weight: 723;
+          "
+        >
+          Database of Chemical for Organophosphate
+        </span>
+      </div>
+
+      <div class="item-row">
+        <button type="button" class="btn btn-outline-dark">
+          <a class="dropdown-item" href="/key_search">Keyword Search</a>
+        </button>
+      </div>
+      <div class="item-row">
+        <button type="button" class="btn btn-outline-dark">
+          <a class="dropdown-item" href="/category">OPCs Category</a>
+        </button>
+      </div>
+      <div class="item-row">
+        <button type="button" class="btn btn-outline-dark">
+          <a class="dropdown-item" href="/HPVC?page=1">HPV-OPCs</a>
+        </button>
+      </div>
+
+      <div class="item-row">
+        <button type="button" class="btn btn-outline-dark">
+          <a class="dropdown-item" href="/ms_fragment">MS/MS Search</a>
+        </button>
+      </div>
+      <div class="item-row">
+        <button type="button" class="btn btn-outline-dark">
+          <a class="dropdown-item" href="/prediction_index">MS/MS Prediction</a>
+        </button>
+      </div>
+
+      <div class="item-row">
+        <button type="button" class="btn btn-outline-dark">
+          <a class="dropdown-item" href="/introduction">Help</a>
+        </button>
+      </div>
+
+      <div
+        calss=""
+        style="
+          display: inline-block;
+          position: absolute;
+          right: 1px;
+          align-items: center;
+          padding: 1px;
+        "
+      >
+        <button
+          type="button"
+          class="btn btn-outline-warning"
+          style="font-size: 8px"
+          onclick="confirmAction()"
+        >
+          Import <br />new dataset
+        </button>
+      </div>
+    </div>
+    {% block content %}{% endblock %}
+    <script src="{{ url_for('static', filename='js/jquery-3.7.1.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+    {% block js %}{% endblock %}
+    <script>
+      function confirmAction() {
+        // 显示确认对话框
+        const isConfirmed = confirm(
+          "Are you sure you want to delete the existing database and import a new one?"
+        );
+
+        if (isConfirmed) {
+          // 如果用户点击确定，跳转到后端路由
+          window.location.href = "/improt_newDataset";
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,76 @@
+{% extends 'main.html' %} {% block content %}
+<div class="mid" style="margin-top: 30px">
+  <!--
+  <img
+    src="{{ url_for('static', filename='images/2.png') }}"
+    style="margin-left: 100px; width: 1200px; height: 300px"
+    alt=""
+  />
+  -->
+</div>
+<div style="color: blue; font-size: 18px; margin-left: 100px">{{notice}}</div>
+<div
+  class="item-row"
+  style="
+    font-family: Arial;
+    font-size: 25px;
+    line-height: 1.5;
+    font-style: italic;
+    color: #333;
+  "
+>
+  First Import your data files:
+</div>
+<div class="upload-box">
+  <h2>Upload your Excel files</h2>
+  <form id="uploadForm" enctype="multipart/form-data">
+    <input
+      type="file"
+      name="files"
+      id="fileInput"
+      multiple
+      accept=".xls,.xlsx"
+    />
+    <button type="button" onclick="uploadFiles()">Upload Files</button>
+  </form>
+  <div id="status"></div>
+</div>
+
+{% endblock %} {% block js %}
+<script>
+  function uploadFiles() {
+    const formData = new FormData(document.getElementById("uploadForm"));
+    const statusDiv = document.getElementById("status");
+
+    statusDiv.innerHTML = "Uploading...";
+    statusDiv.style.color = "#666";
+
+    fetch("/upload", {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        let message = `<strong>${data.message}</strong>`;
+
+        if (data.details.success.length > 0) {
+          message +=
+            "<br>Successful files: <br>" +
+            data.details.success.map((f) => `• ${f.original}`).join("<br>");
+        }
+        if (data.details.errors.length > 0) {
+          message +=
+            "<br>Failed files: <br>" + data.details.errors.join("<br>");
+        }
+
+        statusDiv.innerHTML = message;
+        statusDiv.style.color = data.success ? "green" : "red";
+        document.getElementById("fileInput").value = "";
+      })
+      .catch((error) => {
+        statusDiv.innerHTML = "Upload request failed: " + "error";
+        statusDiv.style.color = "red";
+      });
+  }
+</script>
+{% endblock %}

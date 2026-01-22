@@ -1,0 +1,212 @@
+{% extends 'main.html' %} {% block content %}
+<div class="mid" style="margin-top: 30px">
+  <div class="img" style="display: inline-block">
+    <img
+      src="{{ url_for('static', filename='chemical_structure.png') }}"
+      style="margin-left: 20px; width: 600px; height: 300px"
+      alt=""
+    />
+  </div>
+
+  <div class="Search" style="display: inline-block; margin-left: 100px">
+    <form method="post">
+      <div class="mb-3">
+        <select
+          class="form-select form-select-lg"
+          id="item_select"
+          aria-label=".form-select-lg example"
+          style="width: 280px"
+          name="choose"
+        >
+          <option value="1" selected>Chemical Identifier</option>
+          <option value="2">Compound Name</option>
+          <option value="3">Isomeric SMILES</option>
+        </select>
+        <input
+          type="text"
+          class="form-control"
+          id="textInput"
+          style="width: 500px; margin-top: 10px"
+          name="key"
+          value="{{key}}"
+        />
+      </div>
+      <button type="submit" class="btn btn-info">Search</button>
+    </form>
+  </div>
+</div>
+<div
+  class="show_data"
+  style="margin-top: 15px; margin-left: 50px; font-weight: bold"
+>
+  result ：
+</div>
+{#show result data#}
+<div class="card" style="max-width: 1200px; margin: 20px auto">
+  <div class="card-body">
+    <div class="input-group mb-3">
+      <span class="input-group-text" for="inputGroupFile01">CID : </span>
+      <input
+        type="text"
+        id="cid"
+        class="form-control"
+        value="{{data[0]}}"
+        readonly
+      />
+    </div>
+    <div class="input-group mb-3">
+      <span class="input-group-text" for="inputGroupFile01">category : </span>
+      <input
+        type="text"
+        id="category"
+        class="form-control"
+        value="{{category}}"
+        readonly
+      />
+    </div>
+    <div class="input-group mb-3">
+      <span class="input-group-text" for="inputGroupFile01">Cmpdname : </span>
+      <input
+        type="text"
+        id="Cmpdname"
+        class="form-control"
+        value="{{data[1]}}"
+        readonly
+      />
+    </div>
+    <div class="input-group mb-3">
+      <span class="input-group-text" for="inputGroupFile01">Exactmass : </span>
+      <input
+        type="text"
+        id="Exactmass"
+        class="form-control"
+        value="{{data[2]}}"
+        readonly
+      />
+    </div>
+    <div class="input-group mb-3">
+      <span class="input-group-text" for="inputGroupFile01">Mf : </span>
+      <input
+        type="text"
+        id="Mf"
+        class="form-control"
+        value="{{data[3]}}"
+        readonly
+      />
+    </div>
+    <div class="input-group mb-3">
+      <span class="input-group-text" for="inputGroupFile01">Mw : </span>
+      <input
+        type="text"
+        id="Mw"
+        class="form-control"
+        value="{{data[4]}}"
+        readonly
+      />
+    </div>
+    <div class="input-group mb-3">
+      <span class="input-group-text" for="inputGroupFile01"
+        >Cmpdsynonym :
+      </span>
+      <textarea
+        type="text"
+        id="Cmpdsynonym"
+        class="form-control"
+        rows="5"
+        readonly
+      >
+        {{data[5]}}
+      </textarea>
+    </div>
+    <div class="input-group mb-3">
+      <span class="input-group-text" for="inputGroupFile01">Inchi : </span>
+      <textarea type="text" id="Inchi" class="form-control" rows="2" readonly>
+        {{data[6]}}
+      </textarea>
+    </div>
+    <div class="input-group mb-3">
+      <span class="input-group-text" for="inputGroupFile01">Isosmiles : </span>
+      <input
+        type="text"
+        id="Isosmiles"
+        class="form-control"
+        value="{{data[7]}}"
+        readonly
+      />
+    </div>
+    <div class="input-group mb-3">
+      <span class="input-group-text" for="inputGroupFile01">Iupacname : </span>
+      <textarea
+        type="text"
+        id="Iupacname"
+        class="form-control"
+        rows="5"
+        readonly
+      >
+          {{data[8]}}
+          </textarea
+      >
+    </div>
+    <!-- 下载按钮 -->
+    <button
+      type="button"
+      class="btn btn-success"
+      style="
+        width: 170px;
+        height: 50px;
+        position: relative;
+        left: 78%;
+        background: pink;
+        margin-bottom: 12px;
+      "
+      onclick="downloadExcel()"
+    >
+      Export to Excel
+    </button>
+  </div>
+</div>
+{% endblock %} {% block js %}
+<script>
+  $(document).ready(function () {
+    const choose = {{key_choose|tojson|safe}}
+      $("#item_select").val(choose);
+      });
+
+  function downloadExcel() {
+    const cmp_data ={{ data | tojson | safe }}
+    const title_data ={{title | tojson | safe}}
+    const category = {{category|tojson|safe}}
+    // 创建示例数据
+    const data = [
+      ["Item", "value"],
+      [title_data[0], cmp_data[0]],
+      [title_data[1], cmp_data[1]],
+      [title_data[2], cmp_data[2]],
+      [title_data[3], cmp_data[3]],
+      [title_data[4], cmp_data[4]],
+      [title_data[5], cmp_data[5]],
+      [title_data[6], cmp_data[6]],
+      [title_data[7], cmp_data[7]],
+      [title_data[8], cmp_data[8]],
+      ['Category', category]
+    ];
+
+    // 创建工作簿和工作表
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.aoa_to_sheet(data);
+
+    // 设置列宽
+    worksheet["!cols"] = [
+      { wch: 15 }, // ID列宽度
+      { wch: 80 }, // 姓名列宽度
+    ];
+
+    // 添加工作表到工作簿
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+    // 生成并下载Excel文件
+    const file_name = "CID-" + cmp_data[0] + ".xlsx";
+    XLSX.writeFile(workbook, file_name);
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'main.html' %} {% block content %}
+<!--
+<div class="mid" style="margin-top: 30px">
+  <img
+    src="{{ url_for('static', filename='images/2.png') }}"
+    style="margin-left: 100px; width: 1200px; height: 300px"
+    alt=""
+  />
+</div>
+-->
+<div class="show_data" style="margin-top: 15px; font-weight: bold">
+  some datas：
+</div>
+<div
+  class="p-3 text-primary-emphasis bg-primary-subtle border border-primary-subtle rounded-3"
+  style="width: 1500px"
+>
+  <table
+    class="table table-light table-hover table-bordered"
+    style="width: 100%; max-width: 1600px; table-layout: fixed"
+  >
+    <thead>
+      <tr>
+        {% for one in title %}
+        <td style="font-size: 17px; font-weight: bold">{{ one }}</td>
+        {%endfor%}
+      </tr>
+    </thead>
+    <tbody>
+      {% for one in data %}
+      <tr>
+        <td>{{ one[0] }}</td>
+        <td>{{ one[1] }}</td>
+        <td>{{ one[2]}}</td>
+        <td>{{ one[3] }}</td>
+        <td>{{ one[4] }}</td>
+        <td>{{ one[5] }}</td>
+        <td>{{ one[6] }}</td>
+        <td>{{ one[7] }}</td>
+        <td>{{ one[8] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{%endblock%}

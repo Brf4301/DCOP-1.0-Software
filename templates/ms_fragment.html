@@ -1,0 +1,195 @@
+{% extends 'main.html' %} {% block css %}
+<style>
+  .result_data {
+    margin-left: 60px;
+    margin-right: 60px;
+  }
+  /* 高亮样式 - 更加强制的样式 */
+  .table tbody tr.highlight td {
+    background-color: #cce5ff !important;
+    border-color: #99ccff !important;
+  }
+
+  /* 禁用Bootstrap的hover效果 */
+  .table-hover tbody tr:hover {
+    background-color: inherit;
+  }
+
+  /* 自定义hover效果 */
+  .table tbody tr:not(.highlight):hover td {
+    background-color: rgba(0, 0, 0, 0.075) !important;
+  }
+
+  /* 高亮行的hover效果 */
+  .table tbody tr.highlight:hover td {
+    background-color: #b8daff !important;
+  }
+
+  /* 添加点击手势提示 */
+  .table tbody tr {
+    cursor: pointer;
+  }
+  /* 按钮容器样式 */
+  .buttons-container {
+    display: flex;
+    justify-content: space-between;
+    margin-left: 60px;
+    margin-right: 60px;
+    margin-top: 15px;
+  }
+</style>
+{% endblock %} {% block content %}
+<div style="margin-top: 15px; margin-left: 60px; margin-right: 60px">
+  Basic information and secondary characteristic mass spectral fragments of 113
+  Organophosphate compounds identified by manual inspection under Full mass AIF
+  scan mode in LC-ESI(+)-Orbitrap-HRMS.
+  <br />
+  Chromatographic Information LC Method: Column: Hypersil GOLD C18 column
+  (100mm×2.1mm×1.9µm); Temperature: 40℃; Mobile phase A: 0.1% formic acid in
+  water, Mobile phase B: MEOH; Flow: 0.4 ml/min; Gradient (Time/% B): 0/5, 1/5,
+  10/100, 18/100, 18.1/5, 23/5.
+  <br />
+  Mass Spectrometry Information MS Method: Ion Source: ESI_Postive; Spray
+  Voltage: 3500V; Sheath Gas Pressure: 35 arb; Auxiliary Gas Pressure:10 arb;
+  Capillary Temperature: 320 ℃; S-lens RF voltage: 50V; Resolution: 70000 FWHM;
+  Automatic Gain Control (AGC) Target: 2×105; Normalized Collision Energy (NCE)
+  Stepped: 20, 40 and 60 eV.
+</div>
+<div class="buttons-container">
+  <div>
+    <button id="exportBtn" class="btn btn-primary">
+      Export selected items
+    </button>
+  </div>
+  <div>
+    <button id="selectAllBtn" class="btn btn-secondary">select all</button>
+  </div>
+</div>
+<div calss="result_data">
+  <table
+    class="table table-light table-hover table-bordered"
+    {#style="width: 100%; max-width: 1600px; table-layout: fixed"
+    #}
+  >
+    <thead>
+      <tr style="font-size: 17px; font-weight: bold">
+        {% for item in title %}
+        <td>{{item}}</td>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in data %}
+      <tr>
+        {% for item_s in row %}
+        <td>{{ item_s }}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{%endblock%} {% block js %}
+<script>
+  $(document).ready(function () {
+    // 重置所有Bootstrap可能的事件处理
+    $("tbody tr").off();
+
+    // 新的行点击事件处理
+    $("tbody tr").on("click", function (e) {
+      // 阻止默认事件和冒泡
+      e.preventDefault();
+      e.stopPropagation();
+
+      // 切换高亮状态
+      if ($(this).hasClass("highlight")) {
+        $(this).removeClass("highlight");
+        $(this)
+          .find("td")
+          .each(function () {
+            $(this).css("background-color", "");
+            $(this).css("border-color", "");
+          });
+      } else {
+        $(this).addClass("highlight");
+        $(this)
+          .find("td")
+          .each(function () {
+            $(this).css("background-color", "#cce5ff");
+            $(this).css("border-color", "#99ccff");
+          });
+      }
+
+      return false;
+    });
+
+    // 全选按钮事件
+    $("#selectAllBtn").click(function () {
+      var allRows = $("tbody tr");
+      var highlightedRows = $("tbody tr.highlight");
+
+      // 如果所有行都已经高亮，则取消全部高亮
+      if (allRows.length === highlightedRows.length) {
+        allRows.removeClass("highlight");
+        allRows.find("td").each(function () {
+          $(this).css("background-color", "");
+          $(this).css("border-color", "");
+        });
+      }
+      // 否则全部高亮
+      else {
+        allRows.addClass("highlight");
+        allRows.find("td").each(function () {
+          $(this).css("background-color", "#cce5ff");
+          $(this).css("border-color", "#99ccff");
+        });
+      }
+    });
+
+    // 导出按钮事件
+    $("#exportBtn").click(function () {
+      // 获取表头
+      const headers = [];
+      $("thead tr td").each(function () {
+        headers.push($(this).text().trim());
+      });
+
+      // 获取高亮的行数据
+      const selectedData = [];
+      $("tbody tr.highlight").each(function () {
+        const rowData = [];
+        $(this)
+          .find("td")
+          .each(function () {
+            rowData.push($(this).text().trim());
+          });
+        if (rowData.length > 0) {
+          selectedData.push(rowData);
+        }
+      });
+
+      // 如果没有选中行，提示用户
+      if (selectedData.length === 0) {
+        alert("Please select at least one row of data!");
+        return;
+      }
+
+      // 创建工作簿和工作表
+      const wb = XLSX.utils.book_new();
+
+      // 将表头添加到数据前面，创建工作表
+      selectedData.unshift(headers);
+      const ws = XLSX.utils.aoa_to_sheet(selectedData);
+
+      // 将工作表添加到工作簿
+      XLSX.utils.book_append_sheet(wb, ws, "Exporting data");
+
+      // 导出Excel文件
+      XLSX.writeFile(wb, "Exporting_data.xlsx");
+    });
+
+    // 初始化时禁用Bootstrap的默认事件
+    $(".table-hover").removeClass("table-hover").addClass("custom-hover");
+  });
+</script>
+{% endblock %}

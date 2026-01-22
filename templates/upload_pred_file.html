@@ -1,0 +1,85 @@
+{% extends 'main.html' %} {% block content %}
+<div
+  class="item-ro2w"
+  style="
+    font-family: Arial;
+    font-size: 25px;
+    line-height: 1.5;
+    font-style: italic;
+    margin-left: 100px;
+    margin-top: 30px;
+    color: #333;
+  "
+>
+  Import the data file that needs to be predicted:
+</div>
+<div class="upload-box">
+  <h2>Upload your Excel files</h2>
+  <span style="color: pink"
+    >notice: the input file must contain a 'SMILES' column</span
+  >
+  <br />
+  <span></span>
+  <form id="uploadForm" enctype="multipart/form-data">
+    <input
+      type="file"
+      name="files"
+      id="fileInput"
+      multiple
+      accept=".csv,.xlsx"
+    />
+    <button type="button" onclick="uploadFiles()">Upload Files</button>
+  </form>
+  <div id="status"></div>
+</div>
+<div style="text-align: center; margin-top: 20px">
+  <a href="/predict/batch" class="btn btn-primary my-2">Predict</a>
+</div>
+<div id="fail_msg" style="text-align: center; margin-top: 20px; color: red">
+  {{msg}}
+</div>
+
+<div id="sucess_msg" style="text-align: center; margin-top: 20px; color: blue">
+  {{success}}
+</div>
+
+{% endblock %} {% block js %}
+<script>
+  function uploadFiles() {
+    const formData = new FormData(document.getElementById("uploadForm"));
+    const statusDiv = document.getElementById("status");
+
+    statusDiv.innerHTML = "Uploading...";
+    statusDiv.style.color = "#666";
+
+    fetch("/upload_pred_file", {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        let message = `<strong>${data.message}</strong>`;
+
+        if (data.details.success.length > 0) {
+          message +=
+            "<br>Successful files: <br>" +
+            data.details.success.map((f) => `• ${f.original}`).join("<br>");
+        }
+        if (data.details.errors.length > 0) {
+          message +=
+            "<br>Failed files: <br>" + data.details.errors.join("<br>");
+        }
+
+        statusDiv.innerHTML = message;
+        statusDiv.style.color = data.success ? "green" : "red";
+        document.getElementById("fileInput").value = "";
+        $("#fail_msg").text("");
+        $("#sucess_msg").text("The prediction file has been uploaded.");
+      })
+      .catch((error) => {
+        statusDiv.innerHTML = "Upload request failed: " + "error";
+        statusDiv.style.color = "red";
+      });
+  }
+</script>
+{% endblock %}

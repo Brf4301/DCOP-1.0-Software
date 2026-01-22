@@ -1,0 +1,189 @@
+{% extends 'main.html' %} {% block css %}
+<style>
+  .result_data {
+    margin-left: 60px;
+    margin-right: 60px;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="mid" style="margin-top: 30px">
+  <!--
+  <div class="img" style="display: inline-block">
+    <img
+      src="{{ url_for('static', filename='images/2.png') }}"
+      style="margin-left: 20px; width: 600px; height: 300px"
+      alt=""
+    />
+  </div>
+  -->
+  <div
+    class="Category_chemicals"
+    style="display: inline-block; margin-left: 500px"
+  >
+    <div class="Category_title">
+      <span style="margin-left: 150px; font-size: 20px; font-weight: 700"
+        >Category chemicals</span
+      >
+    </div>
+    <div class="Category_list" style="margin-top: 30px">
+      <div calss="category_col_01" style="display: inline-block">
+        <ul class="list-group">
+          {% for k,v in category_data_01.items() %}
+          <li
+            class="list-group-item"
+            id="{{category_index[k]}}"
+            style="padding-top: 10px"
+          >
+            <a class="dropdown-item" href="/category_result/{{k}}"
+              >{{k}} ({{v}})</a
+            >
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div calss="category_col_02" style="display: inline-block">
+        <ul class="list-group">
+          {% for k,v in category_data_02.items() %}
+          <li
+            class="list-group-item"
+            id="{{category_index[k]}}"
+            style="padding-top: 10px"
+          >
+            <a class="dropdown-item" href="/category_result/{{k}}"
+              >{{k}} ({{v}})</a
+            >
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<div
+  class="show_data"
+  style="margin-top: 15px; margin-left: 50px; font-weight: bold"
+>
+  result ：
+</div>
+<form method="post" action="/category_result/{{category}}">
+  <div class="mb-3">
+    <select
+      class="form-select form-select-sm"
+      id="page_select"
+      aria-label=".form-select-lg example"
+      style="width: 170px; display: inline-block"
+      name="cur_page"
+    >
+      <option value="1">Page 1 of {{total_page}}</option>
+      {% for p in range(2,total_page+1) %}
+      <option value="{{p}}">Page {{p}} of {{total_page}}</option>
+      {% endfor %}
+    </select>
+    <select
+      class="form-select form-select-sm"
+      id="pageSize_select"
+      aria-label=".form-select-lg example"
+      style="width: 180px; display: inline-block"
+      name="page_size"
+    >
+      <option value="10">10 Items for page</option>
+      <option value="15">15 Items for page</option>
+      <option value="20">20 Items for page</option>
+    </select>
+    <button
+      type="submit"
+      class="btn btn-info"
+      style="
+        display: inline-block;
+        height: 30px;
+        margin-left: 50px;
+        text-align: center;
+      "
+    >
+      Search
+    </button>
+
+    <!-- 下载按钮 -->
+    <button
+      type="button"
+      class="btn btn-success"
+      style="
+        width: 165px;
+        height: 40px;
+        position: relative;
+        left: 52%;
+        background: pink;
+      "
+      onclick="downloadExcel()"
+    >
+      Export to Excel
+    </button>
+  </div>
+</form>
+
+<div calss="result_data">
+  <table
+    class="table table-light table-hover table-bordered"
+    {#style="width: 100%; max-width: 1600px; table-layout: fixed"
+    #}
+  >
+    <thead>
+      <tr style="font-size: 17px; font-weight: bold">
+        {% for item in title %}
+        <td>{{item}}</td>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in data %}
+      <tr>
+        {% for item_s in row %}
+        <td>{{ item_s }}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{%endblock%} {% block js %}
+<script>
+  $(document).ready(function () {
+          const category = {{category|tojson|safe}};
+          const category_index_dict = {{category_index|tojson|safe}}
+          console.log(category_index_dict[category]);
+          const $element = $('#' + category_index_dict[category]);
+          if ($element.length) {
+                $element.addClass('hightlight');
+                //console.log('类已成功添加');
+            } else {
+                //console.warn('未找到对应ID的元素');
+            }
+          const page = {{page|tojson|safe}};
+          const page_size = {{page_size|tojson|safe}};
+          $('#page_select').val(page);
+          $('#pageSize_select').val(page_size);
+  });
+  <!--将某一类别所有数据导出到Excel文件 以化合物类型命名该文件-->
+  function downloadExcel() {
+    const cmp_data ={{ all_data | tojson | safe }}
+    const title_data ={{title | tojson | safe}}
+    const category = {{category|tojson|safe}}
+    // 创建示例数据
+    const data = [
+      title_data
+    ];
+    const mergedData = [...data, ...cmp_data];
+    // 创建工作簿和工作表
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.aoa_to_sheet(mergedData);
+
+
+    // 添加工作表到工作簿
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+    // 生成并下载Excel文件
+    const file_name = category + ".xlsx";
+    XLSX.writeFile(workbook, file_name);
+  }
+</script>
+{% endblock %}

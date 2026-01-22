@@ -1,0 +1,72 @@
+{% extends 'main.html' %} {%block css%}
+<style>
+  .list-group-item.active {
+    background-color: rgba(13, 109, 253, 0.5) !important;
+    border-color: #0d6efd !important;
+  }
+</style>
+{%endblock%} {% block content %}
+<div class="mid" style="margin-top: 30px">
+  <div
+    class="Category_chemicals"
+    style="display: inline-block; margin-left: 500px"
+  >
+    <div class="Category_title">
+      <span style="margin-left: 150px; font-size: 20px; font-weight: 700"
+        >Category chemicals</span
+      >
+    </div>
+    <div class="Category_list" style="margin-top: 30px">
+      <div calss="catagory_col_01" style="display: inline-block">
+        <ul class="list-group">
+          {% for k,v in category_data_01.items() %}
+          <li class="list-group-item" id="{{k}}" style="padding-top: 10px">
+            <a
+              class="dropdown-item"
+              href="/category_result/{{k}}?page=1&page_size=10"
+              >{{k}} ({{v}})</a
+            >
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div calss="catagory_col_02" style="display: inline-block">
+        <ul class="list-group">
+          {% for k,v in category_data_02.items() %}
+          <li class="list-group-item" id="k" style="padding-top: 10px">
+            <a
+              class="dropdown-item"
+              href="/category_result/{{k}}?page=1&page_size=10"
+              >{{k}} ({{v}})</a
+            >
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{%endblock%} {% block js%}
+<script>
+  // 获取所有列表项
+  const allItems = document.querySelectorAll("li");
+
+  // 统一高亮处理函数
+  function handleSelection(clickedItem) {
+    // 移除所有项的active类
+    allItems.forEach((item) => item.classList.remove("active"));
+
+    // 添加当前项高亮
+    clickedItem.classList.add("active");
+
+    // 可选：获取选中项数据
+    const selectedText = clickedItem.textContent;
+    console.log("当前选中：", selectedText);
+  }
+
+  // 绑定点击事件
+  allItems.forEach((item) => {
+    item.addEventListener("click", () => handleSelection(item));
+  });
+</script>
+{%endblock%}

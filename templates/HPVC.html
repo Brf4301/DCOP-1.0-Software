@@ -1,0 +1,194 @@
+{% extends 'main.html' %}{%block css%}
+<style>
+  /* 模态框样式 */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+  }
+
+  .modal-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 20px;
+    width: 80%;
+    max-width: 800px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .close-btn {
+    float: right;
+    cursor: pointer;
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+  /* 触发元素样式 */
+  .trigger-item {
+    cursor: pointer;
+    padding: 10px;
+    margin: 10px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+  }
+</style>
+{%endblock%} {% block content %}
+<div class="mid" style="margin-top: 30px">
+  <!--
+  <div class="img" style="display: inline-block">
+    <img
+      src="{{ url_for('static', filename='images/2.png') }}"
+      style="margin-left: 20px; width: 600px; height: 300px"
+      alt=""
+    />
+  </div>
+  -->
+  <div
+    class="hpvc"
+    style="
+      display: inline-block;
+      margin-left: 500px;
+      font-size: 20px;
+      font-weight: 700;
+    "
+  >
+    High Production Volume Chemicals Search
+  </div>
+  <div style="margin-left: 200px">
+    The database contains any information annotations on each High production
+    volume (HPV) chemical from European Chemicals Agency and Pubchem
+  </div>
+
+  <form method="post" action="/HPVC">
+    <div class="mb-3" style="margin-left: 100px; margin-top: 20px">
+      <select
+        class="form-select form-select-sm"
+        id="page_select"
+        aria-label=".form-select-lg example"
+        style="width: 170px; display: inline-block"
+        name="cur_page"
+      >
+        <option value="1">Page 1 of {{total_page}}</option>
+        {% for p in range(2,total_page+1) %}
+        <option value="{{p}}">Page {{p}} of {{total_page}}</option>
+        {% endfor %}
+      </select>
+      <span>Showing 1-{{total_page}} of {{total}} results</span>
+      <button
+        type="submit"
+        class="btn btn-info"
+        style="
+          display: inline-block;
+          height: 30px;
+          margin-left: 50px;
+          text-align: center;
+        "
+      >
+        Search
+      </button>
+    </div>
+  </form>
+  <div
+    class="show_data"
+    style="margin-top: 15px; width: 1265px; margin-left: 100px"
+  >
+    <table
+      class="table table-light table-hover table-bordered"
+      {#style="width: 100%; max-width: 1600px; table-layout: fixed"
+      #}
+    >
+      <thead>
+        <tr style="font-size: 17px; font-weight: bold">
+          {% for item in title %}
+          <td>{{item}}</td>
+          {% endfor %}
+          <td>More Detail</td>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in data %}
+        <tr>
+          {% for item_s in row[:9] %}
+          <td>{{ item_s }}</td>
+          {% endfor %}
+          <td>
+            <div
+              class="trigger-item"
+              style="color: blue; font-size: 18px"
+              data-id="{{row[0]}}"
+            >
+              detail
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <!-- 模态框 -->
+  <div id="detailModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <h2>More Details</h2>
+      <p id="detailContent">Loading...</p>
+    </div>
+  </div>
+  {%endblock%} {% block js %}
+  <script>
+    $(document).ready(function () {
+
+            const page = {{page|tojson|safe}};
+            $('#page_select').val(page);
+
+
+          const detailData={{detail_data|tojson|safe}};
+          const detailTitle={{other_title|tojson|safe}};
+          const t1 = detailTitle[0];
+
+          <!-- 点击元素 弹出一个模板框 显示更多细节内容 -->
+          // 点击触发元素
+          $(".trigger-item").click(function () {
+            const itemId = $(this).data("id");
+            const itemData = detailData[itemId];
+
+            // 填充数据
+            $("#detailContent").html(`
+                  <p><strong>${detailTitle[0]}：</strong>${itemData[0]}</p>
+                  <p><strong>${detailTitle[1]}：</strong>${itemData[1]}</p>
+                  <p><strong>${detailTitle[2]}：</strong>${itemData[2]}</p>
+                  <p><strong>${detailTitle[3]}：</strong>${itemData[3]}</p>
+                  <p><strong>${detailTitle[4]}：</strong>${itemData[4]}</p>
+                  <p><strong>${detailTitle[5]}：</strong>${itemData[5]}</p>
+                  <p><strong>${detailTitle[6]}：</strong>${itemData[6]}</p>
+                  <p><strong>${detailTitle[7]}：</strong>${itemData[7]}</p>
+                  <p><strong>${detailTitle[8]}：</strong>${itemData[8]}</p>
+                  <p><strong>${detailTitle[9]}：</strong>${itemData[9]}</p>
+                  <p><strong>${detailTitle[10]}：</strong>${itemData[10]}</p>
+                  <p><strong>${detailTitle[11]}：</strong>${itemData[11]}</p>
+                  <p><strong>${detailTitle[12]}：</strong>${itemData[12]}</p>
+                  <p><strong>${detailTitle[13]}：</strong>${itemData[13]}</p>
+                  <p><strong>${detailTitle[14]}：</strong>${itemData[14]}</p>
+
+              `);
+
+            // 显示模态框
+            $("#detailModal").fadeIn();
+          });
+
+          // 关闭模态框
+          $(".close-btn, .modal").click(function (e) {
+            if (e.target === this) {
+              // 确保点击的是模态框背景
+              $("#detailModal").fadeOut();
+            }
+          });
+    });
+  </script>
+  {%endblock%}
+</div>

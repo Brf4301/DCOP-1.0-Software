@@ -1,0 +1,57 @@
+{% extends 'main.html' %} {% block content %}
+<div class="mid" style="margin-top: 30px">
+  <!--
+  <div class="img" style="display: inline-block">
+    <img
+      src="{{ url_for('static', filename='images/2.png') }}"
+      style="margin-left: 20px; width: 600px; height: 300px"
+      alt=""
+    />
+  </div>
+  -->
+  <div class="Search" style="display: inline-block; margin-left: 500px">
+    <form method="post">
+      <div class="mb-3">
+        <select
+          class="form-select form-select-lg"
+          id="item_select"
+          aria-label=".form-select-lg example"
+          style="width: 280px"
+          name="choose"
+        >
+          <option value="1">Chemical Identifier</option>
+          <option value="2">Compound Name</option>
+          <option value="3" selected>Isomeric SMILES</option>
+        </select>
+        <input
+          type="text"
+          class="form-control"
+          id="textInput"
+          style="width: 500px; margin-top: 10px"
+          name="key"
+          value="{{key}}"
+        />
+      </div>
+      <button type="submit" class="btn btn-info">Search</button>
+    </form>
+  </div>
+</div>
+<div
+  class="show_data"
+  style="margin-top: 15px; margin-left: 50px; font-weight: bold"
+>
+  result ：
+</div>
+<div
+  style="margin-top: 15px; margin-left: 500px; magin-top: 50px; font-size: 28px"
+>
+  {{not_found_s}}
+</div>
+{%endblock%} {% block js %}
+<script>
+  $(document).ready(function () {
+    const choose = {{key_choose|tojson|safe}}
+      $("#item_select").val(choose);
+      });
+</script>
+{% endblock %}

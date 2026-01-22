@@ -1,0 +1,129 @@
+{% extends 'main.html' %}{% block css %}
+<style>
+  .error_msg {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: red;
+  }
+  .base_info {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+  }
+  .predict_part {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+  }
+  h1 {
+    color: #2c3e50;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+  }
+  h2 {
+    color: #34495e;
+    margin-top: 25px;
+  }
+  dl {
+    display: grid;
+    grid-template-columns: max-content 1fr; /* 左列根据内容宽度自适应 */
+    gap: 5px 15px; /* 行间距5px 列间距15px */
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 5px;
+    margin: 0;
+  }
+  dt {
+    grid-column: 1; /* 强制dt显示在第一列 */
+    font-weight: bold;
+    color: #2c3e50;
+    min-width: 180px; /* 保证标题列最小宽度 */
+  }
+  dd {
+    grid-column: 2; /* 强制dd显示在第二列 */
+    margin: 0;
+    color: #7f8c8d;
+    word-break: break-word; /* 处理长内容换行 */
+  }
+  .status {
+    color: #27ae60;
+    font-weight: bold;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="container" style="margin-top: 30px">
+  <form method="post" action="/prediction/single">
+    <div class="input-group mb-3">
+      <span class="input-group-text" for="inputGroupFile01"
+        >SMlLES input :
+      </span>
+      <input type="text" id="Isosmiles" name="smiles" class="form-control" />
+    </div>
+    <button
+      type="submit"
+      class="btn btn-info"
+      style="float: right; margin-right: 5%"
+      v-on:click="predictClick"
+    >
+      Predict
+    </button>
+  </form>
+</div>
+<div class="error_msg">{{msg}}</div>
+
+<div class="base_info">
+  <h1>Results</h1>
+
+  <section>
+    <h2>Spectrum Prediction Input Parameters:</h2>
+
+    <dl>
+      <dt>Parent Compound Structure (SMILES Format)</dt>
+      <dd>{{base_data[7]}}</dd>
+
+      <dt>Chemical Identifier</dt>
+      <dd>{{base_data[0]}}</dd>
+
+      <dt>Compound Name</dt>
+      <dd>{{base_data[1]}}</dd>
+
+      <dt>ExactMass</dt>
+      <dd>{{base_data[2]}}</dd>
+
+      <dt>Molecular Formula</dt>
+      <dd>{{base_data[3]}}</dd>
+
+      <dt>Molecular Weight</dt>
+      <dd>{{base_data[4]}}</dd>
+    </dl>
+  </section>
+</div>
+<div class="predict_part">
+  <table
+    class="table table-light table-hover table-bordered"
+    {#style="width: 100%; max-width: 800px; table-layout: fixed"
+    #}
+  >
+    <thead>
+      <tr style="font-size: 17px; font-weight: bold">
+        <td>id</td>
+        <td>mz</td>
+        <td>intensity</td>
+      </tr>
+    </thead>
+    <tbody>
+      {% for i in range(100) %}
+      <tr>
+        <td>{{i+1}}</td>
+        <td>{{mz_datas[i]}}</td>
+        <td>{{intensity_datas[i]}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock%}
